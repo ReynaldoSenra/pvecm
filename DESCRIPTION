@@ -1,6 +1,6 @@
 Package: pvecm
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Estimate VECM for heterogeneous panels as in Canning and Pedroni (2008)
 Version: 1.0
 Author: Reynaldo Senra Hodelin
 Maintainer: Reynaldo Senra Hodelin <reynaldosenra@gmx.com>
