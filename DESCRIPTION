@@ -1,0 +1,24 @@
+Package: pvecm
+Type: Package
+Title: What the Package Does (Title Case)
+Version: 1.0
+Author: Reynaldo Senra Hodelin
+Maintainer: Reynaldo Senra Hodelin <reynaldosenra@gmx.com>
+Description: Estimates VECM models for heterogeneous panels. It also applies long-run
+    causality tests as in Canning and Pedroni (2008).
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    AICcmodavg,
+    base,
+    cointReg,
+    data.table,
+    dplyr,
+    dynlm,
+    plm,
+    stats,
+    utils
+Depends: 
+    zoo
+RoxygenNote: 7.1.1
