@@ -83,7 +83,7 @@ pvecm <- function(right_hand_side, left_hand_side, I_0_dols = NULL, cross_sectio
         ECT <- append(ECT,long_run$residuals)
       } else if (deterministic_long == "trend") {
         coefficient_names <- c("trend", "drift", base::colnames(datas)[c(2:base::ncol(datas))])
-        trend <- c(1:length(drift))
+        trend <- c(1:nrow(drift))
         deter <- base::cbind(trend,drift)
         long_run <- cointReg::cointReg(right_hand_sides, left_hand_sides, deter = deter, method = "D", kernel = kernel,
                                        bandwidth = bandwidth, n.lead = n.lead, n.lag = n.lag, kmax = kmax, info.crit = info.crit, demeaning = demeaning, check = check)
