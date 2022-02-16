@@ -35,7 +35,6 @@ pvecm <- function(right_hand_side, left_hand_side, I_0_dols = NULL, cross_sectio
                   bandwidth = "and", n.lead = NULL, n.lag = NULL,
                   kmax = "k4", info.crit = "AIC", demeaning = FALSE,
                   check = TRUE) {
-
   vcem_cross <- list()
   individual_cross <- list()
   resid_cd <- list()
@@ -63,17 +62,20 @@ pvecm <- function(right_hand_side, left_hand_side, I_0_dols = NULL, cross_sectio
     datas <- base::diff(base::as.matrix(base::cbind(left_hand_sides, right_hand_sides)))
     if (method == "D") {
       drift <- rep(1, times = nrow(right_hand_sides))
+      trend <- c(1:length(drift)) 
       I_0_dolss <-  I_0_dols
       if (!is.null(I_0_dols)) {
         I_0_dolss <-  base::subset(dato[c(base::colnames(cross_sections), base::colnames(I_0_dols))], dato[[1]] %in% i)
         I_0_dolss <-  I_0_dolss[-1]
         datas <- base::diff(base::as.matrix(base::cbind(left_hand_sides, I_0_dolss, right_hand_sides)))
         drift <- base::cbind(drift, I_0_dolss)
+        trend <- c(1:nrow(drift))
       }
       if (deterministic_long == "drift") {
         coefficient_names <- c("drift",base::colnames(datas)[c(2:base::ncol(datas))])
         long_run <- cointReg::cointReg(right_hand_sides, left_hand_sides, deter = drift, method = "D", kernel = kernel,
-                                       bandwidth = bandwidth, n.lead = n.lead, n.lag = n.lag, kmax = kmax, info.crit = info.crit, demeaning = demeaning, check = check)
+                                       bandwidth = bandwidth, n.lead = n.lead, n.lag = n.lag, kmax = kmax, info.crit = info.crit, demeaning = demeaning, 
+                                       check = check)
         if (i == 1) {
           matrix_coef <- matrix(,nrow = cr,ncol = length(long_run$theta))
           matrix_t <- matrix(,nrow = cr,ncol = length(long_run$t.theta))
@@ -83,10 +85,10 @@ pvecm <- function(right_hand_side, left_hand_side, I_0_dols = NULL, cross_sectio
         ECT <- append(ECT,long_run$residuals)
       } else if (deterministic_long == "trend") {
         coefficient_names <- c("trend", "drift", base::colnames(datas)[c(2:base::ncol(datas))])
-        trend <- c(1:nrow(drift))
         deter <- base::cbind(trend,drift)
         long_run <- cointReg::cointReg(right_hand_sides, left_hand_sides, deter = deter, method = "D", kernel = kernel,
-                                       bandwidth = bandwidth, n.lead = n.lead, n.lag = n.lag, kmax = kmax, info.crit = info.crit, demeaning = demeaning, check = check)
+                                       bandwidth = bandwidth, n.lead = n.lead, n.lag = n.lag, kmax = kmax, info.crit = info.crit, demeaning = demeaning, 
+                                       check = check)
         if (i == 1) {
           matrix_coef <- matrix(,nrow = cr,ncol = length(long_run$theta))
           matrix_t <- matrix(,nrow = cr,ncol = length(long_run$t.theta))
@@ -97,7 +99,8 @@ pvecm <- function(right_hand_side, left_hand_side, I_0_dols = NULL, cross_sectio
       } else {
         coefficient_names <- base::colnames(datas)[c(2:base::ncol(datas))]
         long_run <- cointReg::cointReg(right_hand_sides, left_hand_sides, deter = I_0_dolss, method = "D", kernel = kernel,
-                                       bandwidth = bandwidth, n.lead = n.lead, n.lag = n.lag, kmax = kmax, info.crit = info.crit, demeaning = demeaning, check = check)
+                                       bandwidth = bandwidth, n.lead = n.lead, n.lag = n.lag, kmax = kmax, info.crit = info.crit, demeaning = demeaning, 
+                                       check = check)
         if (i == 1) {
           matrix_coef <- matrix(,nrow = cr,ncol = length(long_run$theta))
           matrix_t <- matrix(,nrow = cr,ncol = length(long_run$t.theta))
@@ -146,16 +149,14 @@ pvecm <- function(right_hand_side, left_hand_side, I_0_dols = NULL, cross_sectio
         ECT <- append(ECT,long_run$residuals)
       }
     }
-    # ECT1 <- lag(long_run$residuals)
-    # ECT1 <- ECT1[c(2:length(ECT1))]
-    ECT1 <- as.data.frame(utils::head(long_run$residuals,-1))  # changed for the package
+    ECT1 <- as.data.frame(utils::head(long_run$residuals,-1))
     colnames(ECT1) <- "ECT1"
     if (i == 1) {
       ecm_t <- matrix(,nrow = cr,ncol = base::ncol(datas))
       ecm_pvalue <- matrix(,nrow = cr,ncol = base::ncol(datas))
-      aic <- matrix(,nrow = cr,ncol = base::ncol(datas))     # new for the package
-      bic <- matrix(,nrow = cr,ncol = base::ncol(datas))     # new for the package
-      observat <- matrix(,nrow = cr,ncol = base::ncol(datas))   # new for the package
+      aic <- matrix(,nrow = cr,ncol = base::ncol(datas))
+      bic <- matrix(,nrow = cr,ncol = base::ncol(datas))
+      observat <- matrix(,nrow = cr,ncol = base::ncol(datas))
     }
     if (!is.null(dummies)) {
       dummys <-  base::subset(dato[c(base::colnames(cross_sections), base::colnames(dummies))], dato[[1]] %in% i)
@@ -164,64 +165,58 @@ pvecm <- function(right_hand_side, left_hand_side, I_0_dols = NULL, cross_sectio
       base::colnames(dummys) <- base::colnames(dummies)
       datas <- base::cbind(datas,dummys,ECT1)
       if (vecm_lags != maximum_lags) {
-        datus <- stats::ts(datas[c(-(maximum_lags-vecm_lags):-1),])  # new for the package
+        datus <- stats::ts(datas[c(-(maximum_lags-vecm_lags):-1),])
       } else {
-        datus <- stats::ts(datas)  # new for the package
+        datus <- stats::ts(datas)
       }
       datas <- stats::ts(datas)
       names_vecm <- base::colnames(datas)
       if (i == 1) {
         ecm_t <- matrix(,nrow = cr,ncol = (base::ncol(datas)-base::ncol(dummies)-1))
         ecm_pvalue <- matrix(,nrow = cr,ncol = (base::ncol(datas)-base::ncol(dummies)-1))
-        aic <- matrix(,nrow = cr,ncol = (base::ncol(datas)-base::ncol(dummies)-1))    # new for the package
-        bic <- matrix(,nrow = cr,ncol = (base::ncol(datas)-base::ncol(dummies)-1))    # new for the package
-        observat <- matrix(,nrow = cr,ncol = (base::ncol(datas)-base::ncol(dummies)-1))    # new for the package
+        aic <- matrix(,nrow = cr,ncol = (base::ncol(datas)-base::ncol(dummies)-1))
+        bic <- matrix(,nrow = cr,ncol = (base::ncol(datas)-base::ncol(dummies)-1))
+        observat <- matrix(,nrow = cr,ncol = (base::ncol(datas)-base::ncol(dummies)-1))
       }
       for (j in 1:(base::ncol(datas)-base::ncol(dummies)-1)) {
         if (deterministic_short == "drift") {
           formulation <- stats::as.formula(paste(names_vecm[j],paste(paste(paste("L(", names_vecm[-c((length(names_vecm)-base::ncol(dummies)):length(names_vecm))],",1:",vecm_lags,")", sep = ""), collapse = "+"), paste(names_vecm[c((length(names_vecm)-base::ncol(dummies)):length(names_vecm))],collapse = "+")  , sep = "+" ), sep = "~"))
-
           short_run <- dynlm::dynlm(formulation, data = datas)
-          short_run1 <- dynlm::dynlm(formulation, data = datus)  # new for the package
-
+          short_run1 <- dynlm::dynlm(formulation, data = datus)
         } else {
-
           short_run <- dynlm::dynlm(stats::as.formula(paste(names_vecm[j],paste("trend(datas[,1])",paste(paste("L(", names_vecm[-c((length(names_vecm)-base::ncol(dummies)):length(names_vecm))],",1:",vecm_lags,")", sep = ""), collapse = "+"),paste(names_vecm[(length(names_vecm)-base::ncol(dummies)):length(names_vecm)],collapse = "+"), sep = "+" ) ,sep = "~")), data = datas)
-          short_run1 <- dynlm::dynlm(stats::as.formula(paste(names_vecm[j],paste("trend(datas[,1])" ,paste(paste("L(", names_vecm[-c((length(names_vecm)-base::ncol(dummies)):length(names_vecm))],",1:",vecm_lags,")", sep = ""), collapse = "+"),paste(names_vecm[(length(names_vecm)-base::ncol(dummies)):length(names_vecm)],collapse = "+"), sep = "+" ) ,sep = "~")), data = datus)  # new for the package
-
+          short_run1 <- dynlm::dynlm(stats::as.formula(paste(names_vecm[j],paste("trend(datas[,1])" ,paste(paste("L(", names_vecm[-c((length(names_vecm)-base::ncol(dummies)):length(names_vecm))],",1:",vecm_lags,")", sep = ""), collapse = "+"),paste(names_vecm[(length(names_vecm)-base::ncol(dummies)):length(names_vecm)],collapse = "+"), sep = "+" ) ,sep = "~")), data = datus)
         }
         ecm_t[i,j]<-summary(short_run)$coefficients[nrow(summary(short_run)$coefficients),3]
         ecm_pvalue[i,j]<-summary(short_run)$coefficients[nrow(summary(short_run)$coefficients),4]
-        aic[i,j] <- AICcmodavg::AICc(short_run1,second.ord = aic_small)    # new for the package
-        bic[i,j] <- BIC(short_run1)    # new for the package
-        observat[i,j] <- stats::nobs(short_run1)   # new for the package
+        aic[i,j] <- AICcmodavg::AICc(short_run1,second.ord = aic_small)
+        bic[i,j] <- BIC(short_run1)
+        observat[i,j] <- stats::nobs(short_run1)
         vcem_cross[[j]] <- list(names_vecm[j], summary(short_run)$coefficients)
       }
     } else {
       datas <- base::cbind(datas,ECT1)
       if (vecm_lags != maximum_lags) {
-        datus <- stats::ts(datas[c(-(maximum_lags-vecm_lags):-1),])  # new for the package
+        datus <- stats::ts(datas[c(-(maximum_lags-vecm_lags):-1),])
       } else {
-        datus <- stats::ts(datas)  # new for the package
+        datus <- stats::ts(datas)
       }
       datas <- stats::ts(datas)
       names_vecm <- base::colnames(datas)
       for (j in 1:(base::ncol(datas)-1)) {
         if (deterministic_short == "drift") {
           formulation <- stats::as.formula(paste(names_vecm[j],paste(paste(paste("L(", names_vecm[-length(names_vecm)],",1:",vecm_lags,")", sep = ""), collapse = "+"),names_vecm[length(names_vecm)], sep = "+" ) ,sep = "~"))
-
           short_run <- dynlm::dynlm(formulation, data = datas)
-          short_run1 <- dynlm::dynlm(formulation, data = datus)  # new for the package
+          short_run1 <- dynlm::dynlm(formulation, data = datus)
         } else {
-
           short_run <- dynlm::dynlm(stats::as.formula(paste(names_vecm[j],paste("trend(datas[,1])" ,paste(paste("L(", names_vecm[-length(names_vecm)],",1:",vecm_lags,")", sep = ""), collapse = "+"),names_vecm[length(names_vecm)], sep = "+" ) ,sep = "~")), data = datas)
           short_run1 <- dynlm::dynlm(stats::as.formula(paste(names_vecm[j],paste("trend(datas[,1])" ,paste(paste("L(", names_vecm[-length(names_vecm)],",1:",vecm_lags,")", sep = ""), collapse = "+"),names_vecm[length(names_vecm)], sep = "+" ) ,sep = "~")), data = datus)
         }
         ecm_t[i,j]<-summary(short_run)$coefficients[nrow(summary(short_run)$coefficients),3]
         ecm_pvalue[i,j]<-summary(short_run)$coefficients[nrow(summary(short_run)$coefficients),4]
-        aic[i,j] <- AICcmodavg::AICc(short_run1,second.ord = aic_small)     # new for the package
-        bic[i,j] <- BIC(short_run1)     # new for the package
-        observat[i,j] <- stats::nobs(short_run1)    # new for the package
+        aic[i,j] <- AICcmodavg::AICc(short_run1,second.ord = aic_small)
+        bic[i,j] <- BIC(short_run1)
+        observat[i,j] <- stats::nobs(short_run1)
         vcem_cross[[j]] <- summary(short_run)$coefficients
         names(vcem_cross)[[j]] <- names_vecm[j]
       }
