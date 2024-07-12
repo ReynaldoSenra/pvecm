@@ -10,7 +10,7 @@ cause_pvecm(x, type = "lambda")
 \arguments{
 \item{x}{An object which class is 'pvecm'.}
 
-\item{type}{It can be "lambda" (for the Lambda-Pearson type thest), "proportion" (for the method of the proportion of units rejecting the null of no significance of the ECT) or "grouped t" (for the mean group of the ECT t-statistics method). These tests were proposed by Canning and Pedroni in a serie of papers. A description of the tests can be found in Pedroni 2019 (10.1016/b978-0-12-814367-4.00010-1) and Canning and Pedroni 2008 (10.1111/j.1467-9957.2008.01073.x).}
+\item{type}{It can be "lambda" (for the Lambda-Pearson type test), "proportion" (for the method of the proportion of units rejecting the null of no significance of the ECT) or "grouped t" (for the mean group of the ECT t-statistics method). These tests were proposed by Canning and Pedroni in a serie of papers. A description of the tests can be found in Pedroni 2019 (10.1016/b978-0-12-814367-4.00010-1) and Canning and Pedroni 2008 (10.1111/j.1467-9957.2008.01073.x).}
 }
 \description{
 Long-run causality in panel VECM!
