@@ -2,7 +2,7 @@
 #' This function applies three long-run causality tests for panel VECM proposed by Canning and Pedroni.
 #'
 #' @param x An object which class is 'pvecm'.
-#' @param type It can be "lambda" (for the Lambda-Pearson type thest), "proportion" (for the method of the proportion of units rejecting the null of no significance of the ECT) or "grouped t" (for the mean group of the ECT t-statistics method). These tests were proposed by Canning and Pedroni in a serie of papers. A description of the tests can be found in Pedroni 2019 (10.1016/b978-0-12-814367-4.00010-1) and Canning and Pedroni 2008 (10.1111/j.1467-9957.2008.01073.x).
+#' @param type It can be "lambda" (for the Lambda-Pearson type test), "proportion" (for the method of the proportion of units rejecting the null of no significance of the ECT) or "grouped t" (for the mean group of the ECT t-statistics method). These tests were proposed by Canning and Pedroni in a serie of papers. A description of the tests can be found in Pedroni 2019 (10.1016/b978-0-12-814367-4.00010-1) and Canning and Pedroni 2008 (10.1111/j.1467-9957.2008.01073.x).
 #'
 #' @import stats
 #' @export
@@ -15,7 +15,7 @@
 cause_pvecm <- function(x, type = "lambda") {
   cat("
        ###                                          ###
-       ###  Canning-Pedroni long-run ausality test  ###
+       ###  Canning-Pedroni long-run causality test ###
        ###                                          ###\n")
   if (type == "lambda") {
     cat("\nLambda-Pearson test\n")
